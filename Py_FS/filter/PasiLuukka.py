@@ -4,6 +4,7 @@ Date of Development: 05/07/2021
 """
 
 import numpy as np
+import pandas as pd
 from Py_FS.filter._utilities import normalize, Result
 from sklearn import datasets
 
@@ -12,7 +13,7 @@ def PasiLuukka(in_data, target, measure = 'luca', p = 1):
     t = pd.DataFrame(target)
     data = pd.concat([d,t],axis=1)
     
-    # Feature selection method using similarity measure and fuzzy entroropy 
+    # Feature selection method using similarity measure and fuzzy entropy 
     # measures based on the article:
     # P. Luukka, (2011) Feature Selection Using Fuzzy Entropy Measures with
     # Similarity Classifier, Expert Systems with Applications, 38, pp. 4600-4607
