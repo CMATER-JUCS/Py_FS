@@ -17,9 +17,9 @@ from _utilities import Solution, Data, initialize, sort_agents, display, compute
 from _transfer_functions import get_trans_function
 
 
-def AOA(num_agents, max_iter, train_data, train_label, obj_function=compute_fitness,
-                        trans_func_shape='s', save_conv_graph=False):
-    # Name of the optimizer
+def AOA(num_agents, max_iter, train_data, train_label, obj_function=compute_fitness, trans_func_shape='s', save_conv_graph=False):
+    
+    # Archimedes Optimization Algorithm
     ############################### Parameters ####################################
     #                                                                             #
     #   num_agents: number of agents                                              #
