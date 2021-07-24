@@ -261,5 +261,5 @@ def sort_agents_attr(agents, position, volume, density, acceleration, obj, data)
     return sorted_agents, sorted_position, sorted_volume, sorted_density, sorted_acceleration, sorted_fitness
 
 if __name__ == '__main__':
-    iris = datasets.load_iris()
-    AOA(10, 20, iris.data, iris.target, save_conv_graph=False)
+    data = datasets.load_digits()
+    AOA(20, 100, data.data, data.target, save_conv_graph=False)
