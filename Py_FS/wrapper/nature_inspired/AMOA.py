@@ -192,5 +192,5 @@ def mop(max_iter,t,alpha=5):
     return 1 - math.pow((t/max_iter), (1/alpha))
 
 if __name__ == '__main__':
-    iris = datasets.load_iris()
-    AMOA(10, 20, iris.data, iris.target, save_conv_graph=False)
+    data = datasets.load_digits()
+    AMOA(20, 100, data.data, data.target, save_conv_graph=False)
