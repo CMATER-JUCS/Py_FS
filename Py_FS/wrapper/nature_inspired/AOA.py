@@ -2,10 +2,10 @@
 Programmer: Soumitri Chattopadhyay
 Date of Development: 11/07/2021
 This code has been developed according to the procedures mentioned in the following research article:
-"Hashim, F.A., Hussain, K., Houssein, E.H. et al. Archimedes Optimization Algorithm.
-Applied Intelligence, 51, 1531–1551 (2021)"
+"Laith A., Diabat A., Mirjalili S., Elaziz M.A., Gandomi A.H. The Arithmetic Optimization Algorithm.
+Computer Methods in Applied Mechanics and Engineering, 376, 113609 (2021)"
 """
-
+import math
 import numpy as np
 import time
 import matplotlib.pyplot as plt
@@ -13,13 +13,13 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn import datasets
 
-from _utilities import Solution, Data, initialize, sort_agents, display, compute_fitness, compute_accuracy
+from _utilities import Solution, Data, initialize, sort_agents, display, compute_fitness, Conv_plot
 from _transfer_functions import get_trans_function
 
 
 def AOA(num_agents, max_iter, train_data, train_label, obj_function=compute_fitness, trans_func_shape='s', save_conv_graph=False):
     
-    # Archimedes Optimization Algorithm
+    # Arithmetic Optimization Algorithm
     ############################### Parameters ####################################
     #                                                                             #
     #   num_agents: number of agents                                              #
@@ -32,8 +32,8 @@ def AOA(num_agents, max_iter, train_data, train_label, obj_function=compute_fitn
     #                                                                             #
     ###############################################################################
 
-    short_name = 'AOA'
-    agent_name = 'Particles'
+    short_name = 'AMOA'
+    agent_name = 'Agent'
     train_data, train_label = np.array(train_data), np.array(train_label)
     num_features = train_data.shape[1]
     trans_function = get_trans_function(trans_func_shape)
@@ -49,7 +49,7 @@ def AOA(num_agents, max_iter, train_data, train_label, obj_function=compute_fitn
     agents = initialize(num_agents, num_features)
     fitness = np.zeros(num_agents)
     accuracy = np.zeros(num_agents)
-    Leader_agent = np.zeros((1, num_features))
+    Leader_agent = np.zeros((num_features,))
     Leader_fitness = float("-inf")
     Leader_accuracy = float("-inf")
 
@@ -72,31 +72,14 @@ def AOA(num_agents, max_iter, train_data, train_label, obj_function=compute_fitn
     solution.obj_function = obj_function
 
     # initializing parameters
-    C1, C2, C3, C4 = (2, 6, 2, 0.5)
-    upper = 0.9
-    lower = 0.1
-
-    # initializing agent attributes
-    position = np.random.rand(num_agents, num_features)     # Eq. (4)
-    volume = np.random.rand(num_agents, num_features)       # Eq. (5)
-    density = np.random.rand(num_agents, num_features)      # Eq. (5)
-    acceleration = np.random.rand(num_agents, num_features) # Eq. (6)
-
-    # initializing leader agent attributes
-    Leader_position = np.zeros((1, num_features))
-    Leader_volume = np.zeros((1, num_features))
-    Leader_density = np.zeros((1, num_features))
-    Leader_acceleration = np.zeros((1, num_features))
+    lb = 0.1
+    ub = 0.9
+    eps = 1e-6
+    alpha = 5
+    mu = 0.5
 
     # rank initial agents
-    agents, position, volume, density, acceleration, fitness = sort_agents_attr(agents, position, volume, density,
-                                                                               acceleration, obj, data)
-    Leader_agent = agents[0].copy()
-    Leader_fitness = fitness[0].copy()
-    Leader_position = position[0].copy()
-    Leader_volume = volume[0].copy()
-    Leader_density = density[0].copy()
-    Leader_acceleration = acceleration[0].copy()
+    agents, fitness = sort_agents(agents, obj, data)
 
     # start timer
     start_time = time.time()
@@ -106,81 +89,49 @@ def AOA(num_agents, max_iter, train_data, train_label, obj_function=compute_fitn
         print('                          Iteration - {}'.format(iter_no + 1))
         print('================================================================================\n')
 
-        # weight factors
-        Tf = np.exp((iter_no - max_iter) / max_iter)                            # Eq. (8)
-        Df = np.exp((max_iter - iter_no) / max_iter) - (iter_no / max_iter)     # Eq. (9)
+        # Eq. (2)
+        MoA = moa(lb, ub, max_iter, iter_no)
 
-        # updating densities and volumes
+        # Eq. (4)
+        MoP = mop(max_iter, iter_no, alpha)
+
         for i in range(num_agents):
             for j in range(num_features):
-                # Eq. (7)
-                r1, r2 = np.random.random(2)
-                # update density
-                density[i][j] = density[i][j] + r1 * (Leader_density[j] - density[i][j])
-                # update volume
-                volume[i][j] = volume[i][j] + r2 * (Leader_volume[j] - volume[i][j])
 
-        # Exploration phase
-        if Tf <= 0.5:
-            # Eq. (10)
-            for i in range(num_agents):
-                for j in range(num_features):
-                    # update acceleration
-                    rand_vol, rand_density, rand_accn = np.random.random(3)
-                    acceleration[i][j] = (rand_density + rand_vol * rand_accn) / (density[i][j] * volume[i][j])
-                    # update position
-                    r1, rand_pos = np.random.random(2)
-                    # Eq. (13)
-                    position[i][j] = position[i][j] + C1 * r1 * Df * (rand_pos - position[i][j])
+                r1 = np.random.random()
 
-        # Exploitation phase
-        else:
-            # Eq. (11)
-            for i in range(num_agents):
-                for j in range(num_features):
-                    # update acceleration
-                    acceleration[i][j] = (Leader_density[j] + Leader_volume[j] * Leader_acceleration[j]) / (
-                                density[i][j] * volume[i][j])
-                    # update position
-                    r2, r3 = np.random.random(2)
-                    T_ = C3 * Tf
-                    P = 2 * r3 - C4
-                    # Eq. (15)
-                    F = 1 if P <= 0.5 else -1
-                    # Eq. (14)
-                    position[i][j] = position[i][j] + F * C2 * r2 * acceleration[i][j] * Df * (
-                                (T_ * Leader_position[j]) - position[i][j])
+                # Exploration phase (M,D)
+                if r1 > MoA:
+                    # Eq. (3)
+                    r2 = np.random.random()
+                    if r2 >= 0.5:
+                        agents[i,j] = Leader_agent[j] * (MoP + eps) * ((ub-lb) * mu + lb)
+                    else:
+                        agents[i,j] = Leader_agent[j] / (MoP + eps) * ((ub - lb) * mu + lb)
 
-        # Normalize accelerations
-        for i in range(num_agents):
-            max_accn = np.amax(acceleration[i])
-            min_accn = np.amin(acceleration[i])
-            for j in range(num_features):
-                # Eq. (12)
-                acceleration[i][j] = lower + (acceleration[i][j] - min_accn) / (max_accn - min_accn) * upper
-
-        # Convert to binary: lower acceleration => closer to equilibrium
-        for i in range(num_agents):
-            for j in range(num_features):
-                if trans_function(acceleration[i][j]) < np.random.random():
-                    agents[i][j] = 1
+                # Exploitation phase (A,S)
                 else:
-                    agents[i][j] = 0
+                    # Eq. (5)
+                    r3 = np.random.random()
+                    if r3 >= 0.5:
+                        agents[i,j] = Leader_agent[j] + MoP * ((ub - lb) * mu + lb)
+                    else:
+                        agents[i,j] = Leader_agent[j] - MoP * ((ub - lb) * mu + lb)
 
-        ###########################################################################
+                # convert to binary using transfer function
+                if np.random.random() < trans_function(agents[i][j]):
+                    agents[i,j] = 1
+                else:
+                    agents[i,j] = 0
 
         # update final information
-        agents, position, volume, density, acceleration, fitness = sort_agents_attr(agents, position, volume, density, acceleration, obj, data)
+        agents, fitness = sort_agents(agents, obj, data)
         display(agents, fitness, agent_name)
 
         # update Leader (best agent)
         if fitness[0] > Leader_fitness:
             Leader_agent = agents[0].copy()
             Leader_fitness = fitness[0].copy()
-            Leader_position = position[0].copy()
-            Leader_volume = volume[0].copy()
-            Leader_density = density[0].copy()
-            Leader_acceleration = acceleration[0].copy()
 
         convergence_curve['fitness'][iter_no] = Leader_fitness
         convergence_curve['feature_count'][iter_no] = int(np.sum(Leader_agent))
@@ -202,21 +153,7 @@ def AOA(num_agents, max_iter, train_data, train_label, obj_function=compute_fitn
     exec_time = end_time - start_time
 
     # plot convergence curves
-    iters = np.arange(max_iter) + 1
-    fig, axes = plt.subplots(2, 1)
-    fig.tight_layout(pad=5)
-    fig.suptitle('Convergence Curves')
-
-    axes[0].set_title('Convergence of Fitness over Iterations')
-    axes[0].set_xlabel('Iteration')
-    axes[0].set_ylabel('Fitness')
-    axes[0].plot(iters, convergence_curve['fitness'])
-
-    axes[1].set_title('Convergence of Feature Count over Iterations')
-    axes[1].set_xlabel('Iteration')
-    axes[1].set_ylabel('Number of Selected Features')
-    axes[1].plot(iters, convergence_curve['feature_count'])
-
+    fig, axes = Conv_plot(convergence_curve)
     if (save_conv_graph):
         plt.savefig('convergence_graph_' + short_name + '.jpg')
     plt.show()
@@ -233,32 +170,12 @@ def AOA(num_agents, max_iter, train_data, train_label, obj_function=compute_fitn
 
     return solution
 
-def sort_agents_attr(agents, position, volume, density, acceleration, obj, data):
-    # sort the agents according to fitness
-    train_X, val_X, train_Y, val_Y = data.train_X, data.val_X, data.train_Y, data.val_Y
-    (obj_function, weight_acc) = obj
+def moa(lb,ub,max_iter,t):
+    return lb + (ub-lb) * t/max_iter
 
-    # if there is only one agent
-    if len(agents.shape) == 1:
-        num_agents = 1
-        fitness = obj_function(agents, train_X, val_X, train_Y, val_Y, weight_acc)
-        return agents, position, volume, density, acceleration, fitness
+def mop(max_iter,t,alpha=5):
+    return 1 - math.pow((t/max_iter), (1/alpha))
 
-    # for multiple agents
-    else:
-        num_agents = agents.shape[0]
-        fitness = np.zeros(num_agents)
-        for id, agent in enumerate(agents):
-            fitness[id] = obj_function(agent, train_X, val_X, train_Y, val_Y, weight_acc)
-        idx = np.argsort(-fitness)
-        sorted_agents = agents[idx].copy()
-        sorted_fitness = fitness[idx].copy()
-        sorted_position = position[idx].copy()
-        sorted_density = density[idx].copy()
-        sorted_volume = volume[idx].copy()
-        sorted_acceleration = acceleration[idx].copy()
-
-    return sorted_agents, sorted_position, sorted_volume, sorted_density, sorted_acceleration, sorted_fitness
 
 if __name__ == '__main__':
     data = datasets.load_digits()
