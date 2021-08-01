@@ -17,7 +17,7 @@ from _utilities import Solution, Data, initialize, sort_agents, display, compute
 from _transfer_functions import get_trans_function
 
 
-def AOA(num_agents, max_iter, train_data, train_label, obj_function=compute_fitness, trans_func_shape='s', save_conv_graph=False):
+def AROA(num_agents, max_iter, train_data, train_label, obj_function=compute_fitness, trans_func_shape='s', save_conv_graph=False):
     
     # Archimedes Optimization Algorithm
     ############################### Parameters ####################################
@@ -159,15 +159,13 @@ def AOA(num_agents, max_iter, train_data, train_label, obj_function=compute_fitn
                 # Eq. (12)
                 acceleration[i][j] = lower + (acceleration[i][j] - min_accn) / (max_accn - min_accn) * upper
 
-        # Convert to binary: lower acceleration => closer to equilibrium
+        # Convert to binary using transfer function: lower acceleration => closer to equilibrium
         for i in range(num_agents):
             for j in range(num_features):
                 if trans_function(acceleration[i][j]) < np.random.random():
                     agents[i][j] = 1
                 else:
                     agents[i][j] = 0
-
-        ###########################################################################
 
         # update final information
         agents, position, volume, density, acceleration, fitness = sort_agents_attr(agents, position, volume, density, acceleration, obj, data)
@@ -249,4 +247,4 @@ def sort_agents_attr(agents, position, volume, density, acceleration, obj, data)
 
 if __name__ == '__main__':
     data = datasets.load_digits()
-    AOA(20, 100, data.data, data.target, save_conv_graph=False)
+    AROA(20, 100, data.data, data.target, save_conv_graph=False)
