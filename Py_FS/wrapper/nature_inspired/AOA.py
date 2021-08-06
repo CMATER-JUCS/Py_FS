@@ -32,11 +32,13 @@ def AOA(num_agents, max_iter, train_data, train_label, obj_function=compute_fitn
     #                                                                             #
     ###############################################################################
 
-    short_name = 'AMOA'
+    short_name = 'AOA'
     agent_name = 'Agent'
     train_data, train_label = np.array(train_data), np.array(train_label)
     num_features = train_data.shape[1]
     trans_function = get_trans_function(trans_func_shape)
+
+    np.random.seed(0)
 
     # setting up the objectives
     weight_acc = None
@@ -72,8 +74,8 @@ def AOA(num_agents, max_iter, train_data, train_label, obj_function=compute_fitn
     solution.obj_function = obj_function
 
     # initializing parameters
-    lb = 0.1
-    ub = 0.9
+    Min = 0.1
+    Max = 0.9
     eps = 1e-6
     alpha = 5
     mu = 0.5
@@ -90,7 +92,7 @@ def AOA(num_agents, max_iter, train_data, train_label, obj_function=compute_fitn
         print('================================================================================\n')
 
         # Eq. (2)
-        MoA = moa(lb, ub, max_iter, iter_no)
+        MoA = moa(Min, Max, max_iter, iter_no)
 
         # Eq. (4)
         MoP = mop(max_iter, iter_no, alpha)
@@ -105,18 +107,18 @@ def AOA(num_agents, max_iter, train_data, train_label, obj_function=compute_fitn
                     # Eq. (3)
                     r2 = np.random.random()
                     if r2 >= 0.5:
-                        agents[i,j] = Leader_agent[j] * (MoP + eps) * ((ub-lb) * mu + lb)
+                        agents[i,j] = Leader_agent[j] * (MoP + eps) * mu
                     else:
-                        agents[i,j] = Leader_agent[j] / (MoP + eps) * ((ub - lb) * mu + lb)
+                        agents[i,j] = Leader_agent[j] / (MoP + eps) * mu
 
                 # Exploitation phase (A,S)
                 else:
                     # Eq. (5)
                     r3 = np.random.random()
                     if r3 >= 0.5:
-                        agents[i,j] = Leader_agent[j] + MoP * ((ub - lb) * mu + lb)
+                        agents[i,j] = Leader_agent[j] + MoP * mu
                     else:
-                        agents[i,j] = Leader_agent[j] - MoP * ((ub - lb) * mu + lb)
+                        agents[i,j] = Leader_agent[j] - MoP * mu
 
                 # convert to binary using transfer function
                 if np.random.random() < trans_function(agents[i][j]):
@@ -170,8 +172,8 @@ def AOA(num_agents, max_iter, train_data, train_label, obj_function=compute_fitn
 
     return solution
 
-def moa(lb,ub,max_iter,t):
-    return lb + (ub-lb) * t/max_iter
+def moa(Min,Max,max_iter,t):
+    return Min + (Max-Min) * t/max_iter
 
 def mop(max_iter,t,alpha=5):
     return 1 - math.pow((t/max_iter), (1/alpha))

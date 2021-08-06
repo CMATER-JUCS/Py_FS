@@ -8,7 +8,7 @@ from sklearn.model_selection import train_test_split
 from sklearn import datasets
 
 from _utilities_test import Solution, Data, compute_accuracy, compute_fitness, initialize, sort_agents, display, call_counter
-
+from _transfer_functions import get_trans_function
 
 class Algorithm():
     def __init__(self,
@@ -20,6 +20,7 @@ class Algorithm():
                  test_label=None,
                  val_size=30,
                  seed=0,
+                 trans_func_shape='s',
                  save_conv_graph=True,
                  max_evals=np.float("inf"),
                  algo_name=None,
@@ -38,6 +39,7 @@ class Algorithm():
         self.val_size = val_size
         self.weight_acc = None
         self.seed = seed
+        self.trans_function = get_trans_function(trans_func_shape)
         self.save_conv_graph = save_conv_graph
 
         # algorithm internal variables
@@ -88,8 +90,10 @@ class Algorithm():
         self.population = initialize(num_agents=self.num_agents, num_features=num_features)
         self.fitness = self.obj_function(self.population, self.training_data)
         self.population, self.fitness = sort_agents(agents=self.population, fitness=self.fitness)
+        self.Leader_agent = self.population[0, :].copy()
+        self.Leader_fitness = self.fitness[0]
         self.accuracy = compute_accuracy(agents=self.population, data=self.training_data)
-
+        self.Leader_accuracy = self.accuracy[0]
 
     def check_end(self):
         # checks if the algorithm has met the end criterion
@@ -101,19 +105,29 @@ class Algorithm():
         cur_obj = {
             'population': self.population,
             'fitness': self.fitness,
-            'accurcay': self.accuracy,
+            'accuracy': self.accuracy,
         }
         self.history.append(cur_obj)
 
 
-    def display(self):
-        # display the current generation details
-        display(agents=self.population, fitness=self.fitness, agent_name=self.agent_name)
+    def display(self, is_final=False):
+        if is_final:
+            # display final report after FS
+            print('\n================================================================================')
+            print('                                    Final Result                                  ')
+            print('================================================================================\n')
+            print('Leader ' + self.agent_name + ' Dimension : {}'.format(int(np.sum(self.Leader_agent))))
+            print('Leader ' + self.agent_name + ' Fitness : {}'.format(self.Leader_fitness))
+            print('Leader ' + self.agent_name + ' Classification Accuracy : {}'.format(self.Leader_accuracy))
+            print('\n================================================================================\n')
+        else:
+            # display the current generation details
+            display(agents=self.population, fitness=self.fitness, agent_name=self.agent_name)
 
 
     def plot(self):
         # plot the convergence graph
-        fig = plt.figure(figsize=(10, 8))
+        fig = plt.figure(figsize=(6, 6))
         avg_fitness = []
         for cur in self.history:
             avg_fitness.append(np.mean(cur['fitness']))
@@ -170,6 +184,9 @@ class Algorithm():
             self.display()                  # display the details of 1 iteration
             self.save_details()             # save the details
 
+        self.display(is_final=True)         # display final report
+
+        # stop timer
         self.end_time = time.time()     
         self.exec_time = self.end_time - self.start_time
 

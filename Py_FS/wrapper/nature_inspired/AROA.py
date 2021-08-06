@@ -32,7 +32,7 @@ def AROA(num_agents, max_iter, train_data, train_label, obj_function=compute_fit
     #                                                                             #
     ###############################################################################
 
-    short_name = 'AOA'
+    short_name = 'AROA'
     agent_name = 'Particles'
     train_data, train_label = np.array(train_data), np.array(train_label)
     num_features = train_data.shape[1]
