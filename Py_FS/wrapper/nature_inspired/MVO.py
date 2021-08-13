@@ -2,18 +2,17 @@
 Programmer: Soumitri Chattopadhyay
 Date of Development: 27/07/2021
 This code has been developed according to the procedures mentioned in the following research article:
-"Mirjalili, S. and Mirjalili, S.M. and Hatamlou, A. (2016). Multi-Verse Optimizer: a nature-inspired algorithm for global optimization"
-
+"Mirjalili, S. and Mirjalili, S.M. and Hatamlou, A. Multi-Verse Optimizer: a nature-inspired algorithm for global optimization
+Neural Computing & Applications 27, 495–513 (2016)."
 """
 
 import math
+
 import numpy as np
-
-from Py_FS.wrapper.nature_inspired.algorithm import Algorithm
-from Py_FS.wrapper.nature_inspired._utilities_test import compute_fitness, sort_agents, compute_accuracy
-
 from sklearn import datasets
 from sklearn import preprocessing
+
+from Py_FS.wrapper.nature_inspired.algorithm import Algorithm
 
 
 class MVO(Algorithm):
@@ -52,12 +51,10 @@ class MVO(Algorithm):
         self.agent_name = 'Universe'
         self.algo_params = {}
 
-
     def user_input(self):
         self.algo_params['Min'] = 0.2
         self.algo_params['Max'] = 1.0
         self.algo_params['p'] = 0.6
-
 
     def normalize(self, fitness):
         # normalize the fitness values
@@ -66,13 +63,11 @@ class MVO(Algorithm):
         normalized_fitness = np.reshape(normalized_fitness, -1)
         return normalized_fitness
 
-
     def roulette_wheel(self, fitness):
         # Perform roulette wheel selection
         maximum = sum([f for f in fitness])
         selection_probs = [f / maximum for f in fitness]
         return np.random.choice(len(fitness), p=selection_probs)
-
 
     def transfer_to_binary(self, i, j):
         if np.random.random() < self.trans_function(self.population[i, j]):
@@ -128,4 +123,3 @@ if __name__ == '__main__':
                trans_func_shape='s')
 
     solution = algo.run()
-
