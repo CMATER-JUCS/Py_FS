@@ -10,6 +10,9 @@ from Py_FS.wrapper.nature_inspired.PSO import PSO
 from Py_FS.wrapper.nature_inspired.RDA import RDA
 from Py_FS.wrapper.nature_inspired.SCA import SCA
 from Py_FS.wrapper.nature_inspired.WOA import WOA
+
+from Py_FS.wrapper.nature_inspired import _utilities_test, _transfer_functions, algorithm
+
 from Py_FS.wrapper.nature_inspired.AOA import AOA
 from Py_FS.wrapper.nature_inspired.AROA import AROA
 from Py_FS.wrapper.nature_inspired.MVO import MVO
@@ -27,6 +30,9 @@ __all__ = [
     'RDA',
     'SCA',
     'WOA',
+    '_utilities_test',
+    '_transfer_functions',
+    'algorithm',
     'AROA',
     'AOA',
     'MVO'
