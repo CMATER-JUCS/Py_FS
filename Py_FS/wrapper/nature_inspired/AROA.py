@@ -6,16 +6,10 @@ This code has been developed according to the procedures mentioned in the follow
 Applied Intelligence, 51, 1531–1551 (2021)"
 """
 
-import math
 import numpy as np
-import time
-import matplotlib.pyplot as plt
-
-from sklearn.model_selection import train_test_split
 from sklearn import datasets
 
 from Py_FS.wrapper.nature_inspired.algorithm import Algorithm
-from Py_FS.wrapper.nature_inspired._utilities_test import compute_fitness, sort_agents, compute_accuracy
 
 
 class AROA(Algorithm):
@@ -54,7 +48,6 @@ class AROA(Algorithm):
         self.agent_name = 'Particle'
         self.algo_params = {}
 
-
     def user_input(self):
         # initializing parameters
         self.algo_params['C1'] = 2
@@ -63,7 +56,6 @@ class AROA(Algorithm):
         self.algo_params['C4'] = 0.5
         self.algo_params['upper'] = 0.9
         self.algo_params['lower'] = 0.1
-
 
     def initialize(self):
         super(AROA, self).initialize()
@@ -82,7 +74,6 @@ class AROA(Algorithm):
         # rank initial agents
         self.sort_agents_attr()
 
-
     def sort_agents_attr(self):
         # sort the agents according to fitness
         if self.num_agents == 1:
@@ -92,7 +83,7 @@ class AROA(Algorithm):
             idx = np.argsort(-fitnesses)
             self.population = self.population[idx].copy()
             self.fitness = fitnesses[idx].copy()
-            self.position =self.position[idx].copy()
+            self.position = self.position[idx].copy()
             self.density = self.density[idx].copy()
             self.volume = self.volume[idx].copy()
             self.acceleration = self.acceleration[idx].copy()
@@ -104,7 +95,6 @@ class AROA(Algorithm):
         self.Leader_density = self.density[0].copy()
         self.Leader_acceleration = self.acceleration[0].copy()
 
-
     def exploration(self, i, j, Df):
         C1 = self.algo_params['C1']
 
@@ -115,7 +105,6 @@ class AROA(Algorithm):
         r1, rand_pos = np.random.random(2)
         # Eq. (13)
         self.position[i][j] = self.position[i][j] + C1 * r1 * Df * (rand_pos - self.position[i][j])
-
 
     def exploitation(self, i, j, Tf, Df):
         C2 = self.algo_params['C2']
@@ -135,7 +124,6 @@ class AROA(Algorithm):
         self.position[i][j] = self.position[i][j] + F * C2 * r2 * self.acceleration[i][j] * Df * (
                 (T_ * self.Leader_position[j]) - self.position[i][j])
 
-
     def normalize_accn(self, i, j):
         upper = self.algo_params['upper']
         lower = self.algo_params['lower']
@@ -147,14 +135,12 @@ class AROA(Algorithm):
         # Eq. (12)
         self.acceleration[i][j] = lower + (self.acceleration[i][j] - min_accn) / (max_accn - min_accn) * upper
 
-
     def transfer_to_binary(self, i, j):
         # lower acceleration => closer to equilibrium
         if self.trans_function(self.acceleration[i][j]) < np.random.random():
             self.population[i][j] = 1
         else:
             self.population[i][j] = 0
-
 
     def post_processing(self):
         super(AROA, self).post_processing()
@@ -166,7 +152,6 @@ class AROA(Algorithm):
             self.Leader_volume = self.volume[0].copy()
             self.Leader_density = self.density[0].copy()
             self.Leader_acceleration = self.acceleration[0].copy()
-
 
     def next(self):
         print('\n================================================================================')
@@ -206,9 +191,9 @@ class AROA(Algorithm):
 if __name__ == '__main__':
     data = datasets.load_digits()
     algo = AROA(num_agents=20,
-               max_iter=100,
-               train_data=data.data,
-               train_label=data.target,
-               trans_func_shape='s')
+                max_iter=100,
+                train_data=data.data,
+                train_label=data.target,
+                trans_func_shape='s')
 
     solution = algo.run()
