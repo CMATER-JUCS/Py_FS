@@ -10,9 +10,14 @@ from Py_FS.wrapper.nature_inspired.PSO import PSO
 from Py_FS.wrapper.nature_inspired.RDA import RDA
 from Py_FS.wrapper.nature_inspired.SCA import SCA
 from Py_FS.wrapper.nature_inspired.WOA import WOA
+from Py_FS.wrapper.nature_inspired.AOA import AOA
+from Py_FS.wrapper.nature_inspired.AROA import AROA
+from Py_FS.wrapper.nature_inspired.MVO import MVO
 
 
 __all__ = [
+	'AOA',
+	'AROA',
     'BBA',
     'CS',
     'EO',
@@ -21,6 +26,7 @@ __all__ = [
     'GWO',
     'HS',
     'MA',
+    'MVO',
     'PSO',
     'RDA',
     'SCA',
