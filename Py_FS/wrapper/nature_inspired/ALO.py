@@ -60,25 +60,6 @@ class ALO(Algorithm):
     def user_input(self):
         pass
 
-
-    
-    def next(self):
-        print('\n================================================================================')
-        print('\n                          Iteration - {}'.format(self.cur_iter + 1))
-        print('================================================================================\n')
-            
-        self.popul, self.population = self.update_ants(self.popul, self.population,self.cur_iter,self.max_iter,self.weight_acc)
-        self.popul, self.population = self.combine(self.popul, self.population)
-        for i in range(self.num_agents):
-            for j in range(self.train_data.shape[-1]):
-                trans_value=self.trans_function(self.population[i,j])
-                if (np.random.random() < trans_value): 
-                    self.population[i,j] = 1
-                else:
-                    self.population[i,j] = 0
-        self.cur_iter+=1
-        compute_fitness(self.weight_acc)
-
     def random_walk(self,iterations):
         x_random_walk = [0]*(iterations + 1)
         x_random_walk[0] = 0
@@ -158,7 +139,22 @@ class ALO(Algorithm):
                 population[i,j]=(x_random_walk[count] + e_random_walk[count])/2
         return population, antlions
     
-
+    def next(self):
+        print('\n================================================================================')
+        print('\n                          Iteration - {}'.format(self.cur_iter + 1))
+        print('================================================================================\n')
+            
+        self.popul, self.population = self.update_ants(self.popul, self.population,self.cur_iter,self.max_iter,self.weight_acc)
+        self.popul, self.population = self.combine(self.popul, self.population)
+        for i in range(self.num_agents):
+            for j in range(self.train_data.shape[-1]):
+                trans_value=self.trans_function(self.population[i,j])
+                if (np.random.random() < trans_value): 
+                    self.population[i,j] = 1
+                else:
+                    self.population[i,j] = 0
+        self.cur_iter+=1
+        compute_fitness(self.weight_acc)
 
 if __name__ == '__main__':
     data=datasets.load_digits()
