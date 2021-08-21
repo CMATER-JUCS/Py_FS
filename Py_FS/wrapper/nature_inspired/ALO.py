@@ -16,7 +16,6 @@ class ALO(Algorithm):
                  train_label,
                  test_data=None,
                  test_label=None,
-                 val_size=20,
                  trans_func_shape='s',
                  seed=0,
                  save_conv_graph=True,
