@@ -33,7 +33,7 @@ class ALO(Algorithm):
         self.agent_name = 'Antlion'
         self.trans_function = trans_func_shape
         self.algo_params = {}
-        self.popul = initialize(self.num_agents, self.train_data.shape[-1]) #initialise the ants
+        self.ants = initialize(self.num_agents, self.train_data.shape[-1]) #initialise the ants
 
     
     def user_input(self):
@@ -139,8 +139,8 @@ class ALO(Algorithm):
         print('\n                          Iteration - {}'.format(self.cur_iter + 1))
         print('================================================================================\n')
             
-        self.popul, self.population = self.update_ants(self.popul, self.population,self.cur_iter,self.max_iter,self.weight_acc)
-        self.popul, self.population = self.combine(self.popul, self.population)
+        self.ants, self.population = self.update_ants(self.ants, self.population,self.cur_iter,self.max_iter,self.weight_acc)
+        self.ants, self.population = self.combine(self.ants, self.population)
         for i in range(self.num_agents):
             for j in range(self.train_data.shape[-1]):
                 trans_value=self.trans_function(self.population[i,j])
