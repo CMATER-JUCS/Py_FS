@@ -21,39 +21,18 @@ class ALO(Algorithm):
                  seed=0,
                  save_conv_graph=True,
                  max_evals=np.float("inf")):
-
-        # essential user-defined variables
-        self.num_agents = num_agents
-        self.max_iter = max_iter
-        self.training_data = None
-        self.train_data = train_data
-        self.train_label = train_label
         self.trans_func_shape=trans_func_shape
-        # user-defined or default variables
-        self.test_data = test_data
-        self.test_label = test_label
-        self.val_size = val_size
-        self.weight_acc = None
-        self.seed = seed
-        self.save_conv_graph = save_conv_graph
+        super().__init__( num_agents=num_agents,
+                        max_iter=max_iter,
+                        train_data=train_data,
+                        train_label=train_label,
+                        save_conv_graph=save_conv_graph,
+                        seed=seed )
 
-        # algorithm internal variables
-        self.population = None
-        self.num_features = None
-        self.fitness = None
-        self.accuracy = None
-        self.Leader_agent = None
-        self.Leader_fitness = float("-inf")
-        self.Leader_accuracy = float("-inf")
-        self.history = []
-        self.cur_iter = 0
-        self.max_evals = max_evals
-        self.start_time = None
-        self.end_time = None
-        self.exec_time = None
-        self.solution = None
-        self.algo_name = 'Antlion Optimiser'
+        self.algo_name = 'ALO'
         self.agent_name = 'Antlion'
+        self.trans_function = trans_func_shape
+        self.algo_params = {}
         self.popul = initialize(self.num_agents, self.train_data.shape[-1]) #initialise the ants
 
     
