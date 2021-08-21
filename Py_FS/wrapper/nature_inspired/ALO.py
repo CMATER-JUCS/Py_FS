@@ -37,7 +37,9 @@ class ALO(Algorithm):
 
     
     def user_input(self):
-        pass
+        # accept the parameters as user inputs
+        self.algo_params['trans_function'] = input('Shape of Transfer Function [s/v/u]: ') or 's'
+        self.trans_function = get_trans_function(self.algo_params['trans_function'])
 
     
     
