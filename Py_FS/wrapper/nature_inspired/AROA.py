@@ -50,12 +50,12 @@ class AROA(Algorithm):
 
     def user_input(self):
         # initializing parameters
-        self.algo_params['C1'] = 2
-        self.algo_params['C2'] = 6
-        self.algo_params['C3'] = 2
-        self.algo_params['C4'] = 0.5
-        self.algo_params['upper'] = 0.9
-        self.algo_params['lower'] = 0.1
+        self.algo_params['C1'] = float(input('Control variable C1 [1,2]: ') or 2)
+        self.algo_params['C2'] = float(input('Control variable C2 [2,4,6]: ') or 6)
+        self.algo_params['C3'] = float(input('Control variable C3 [1,2]: ') or 2)
+        self.algo_params['C4'] = float(input('Control variable C4 [0-1]: ') or 0.5)
+        self.algo_params['upper'] = float(input('upper limit for normalization [0-1]: ') or 0.9)
+        self.algo_params['lower'] = float(input('lower limit for normalization [0-1]: ') or 0.1)
 
     def initialize(self):
         super(AROA, self).initialize()

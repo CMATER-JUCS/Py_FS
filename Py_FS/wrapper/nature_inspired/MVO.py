@@ -52,9 +52,9 @@ class MVO(Algorithm):
         self.algo_params = {}
 
     def user_input(self):
-        self.algo_params['Min'] = 0.2
-        self.algo_params['Max'] = 1.0
-        self.algo_params['p'] = 0.6
+        self.algo_params['Min'] = float(input('Minimum wormhole existence probability [0-1]: ') or 0.2)
+        self.algo_params['Max'] = float(input('Maximum wormhole existence probability [0-1]: ') or 1.0)
+        self.algo_params['p'] = float(input('Exploitation accuracy factor [1-10]: ') or 6)
 
     def normalize(self, fitness):
         # normalize the fitness values

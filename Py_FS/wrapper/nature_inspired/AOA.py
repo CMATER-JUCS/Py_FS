@@ -52,11 +52,11 @@ class AOA(Algorithm):
 
     def user_input(self):
         # initializing parameters
-        self.algo_params['Min'] = 0.1
-        self.algo_params['Max'] = 0.9
-        self.algo_params['EPS'] = 1e-6
-        self.algo_params['alpha'] = 5
-        self.algo_params['mu'] = 0.5
+        self.algo_params['Min'] = float(input('Minimum value of the accelerated function [0-1]: ') or 0.1)
+        self.algo_params['Max'] = float(input('Maximum value of the accelerated function [0-1]: ') or 0.9)
+        self.algo_params['EPS'] = float(input('Value of epsilon [default: 1e-6]: ') or 1e-6)
+        self.algo_params['alpha'] = float(input('Exploitation accuracy parameter [1-10]:' ) or 5)
+        self.algo_params['mu'] = float(input('Control parameter to adjust the search process [0-1]:' ) or 0.5)
 
     def moa(self, Min, Max):
         return Min + (Max - Min) * self.cur_iter / self.max_iter
