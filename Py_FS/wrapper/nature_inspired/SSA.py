@@ -12,12 +12,10 @@ import math
 
 import numpy as np
 from sklearn import datasets
-import sys
-sys.path.append("D:/#Projects/Multiple Projects Prof. Ram Sarkar/Py_FS/SSA/")
 
-from Py_FS_mod.wrapper.nature_inspired._utilities_test import initialize as initialize_
-from Py_FS_mod.wrapper.nature_inspired._utilities_test import sort_agents as sort_agents_
-from Py_FS_mod.wrapper.nature_inspired.algorithm import Algorithm
+from Py_FS.wrapper.nature_inspired._utilities_test import initialize as initialize_
+from Py_FS.wrapper.nature_inspired._utilities_test import sort_agents as sort_agents_
+from Py_FS.wrapper.nature_inspired.algorithm import Algorithm
 
 
 class SSA(Algorithm):
