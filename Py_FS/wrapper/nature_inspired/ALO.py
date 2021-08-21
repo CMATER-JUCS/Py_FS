@@ -4,8 +4,8 @@ Date of Development: 20/08/2021
 Antlion Optimizer
 """
 import numpy as np
-from wrapper.nature_inspired.algorithm import Algorithm
-from wrapper.nature_inspired._transfer_functions import get_trans_function
+from Py_FS.wrapper.nature_inspired.algorithm import Algorithm
+from Py_FS.wrapper.nature_inspired._transfer_functions import get_trans_function
 from sklearn import datasets
 
 class ALO(Algorithm):
