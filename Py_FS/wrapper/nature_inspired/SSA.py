@@ -12,10 +12,12 @@ import math
 
 import numpy as np
 from sklearn import datasets
+import sys
+sys.path.append("D:/#Projects/Multiple Projects Prof. Ram Sarkar/Py_FS/SSA/")
 
-from Py_FS.wrapper.nature_inspired._utilities_test import initialize as initialize_
-from Py_FS.wrapper.nature_inspired._utilities_test import sort_agents as sort_agents_
-from Py_FS.wrapper.nature_inspired.algorithm import Algorithm
+from Py_FS_mod.wrapper.nature_inspired._utilities_test import initialize as initialize_
+from Py_FS_mod.wrapper.nature_inspired._utilities_test import sort_agents as sort_agents_
+from Py_FS_mod.wrapper.nature_inspired.algorithm import Algorithm
 
 
 class SSA(Algorithm):
@@ -56,19 +58,15 @@ class SSA(Algorithm):
 
     def user_input(self):
         # initializing parameters
-        pdp = self.algo_params['pdp'] = 0.1
-        row = self.algo_params['row'] = 1.204
-        V = self.algo_params['V'] = 5.25
-        S = self.algo_params['S'] = 0.0154
-        cd = self.algo_params['cd'] = 0.6
-        CL = self.algo_params['CL'] = 0.7
-        hg = self.algo_params['hg'] = 1
-        sf = self.algo_params['sf'] = 18
-        Gc = self.algo_params['Gc'] = 1.9
-        D1 = self.algo_params['D1'] = 1 / ((2 * row * V) ** (2 * S * cd))
-        L = self.algo_params['L'] = 1 / ((2 * row * V) ** (2 * S * CL))
-        tanpi = self.algo_params['tanpi'] = D1 / L
-        dg = self.algo_params['dg'] = hg / (tanpi * sf)
+        pdp = self.algo_params['pdp'] = float(input('Predator Presence Probability: ') or 0.1)
+        row = self.algo_params['row'] = float(input('Density of air: ') or 1.204)
+        V = self.algo_params['V'] = float(input('Speed: ') or 5.25)
+        S = self.algo_params['S'] = float(input('Surface area of body: ') or 0.0154)
+        cd = self.algo_params['cd'] = float(input('Frictional Drag Coefficient: ') or 0.6)
+        CL = self.algo_params['CL'] = float(input('Lift Coefficient: ') or 0.7)
+        hg = self.algo_params['hg'] = float(input('Loss in height occurred after gliding: ') or 1)
+        sf = self.algo_params['sf'] = float(input('Scaling Factor: ') or 18)
+        Gc = self.algo_params['Gc'] = float(input('Gliding Constant: ') or 1.9)
 
     def initialize(self):
         super(SSA, self).initialize()
@@ -76,6 +74,10 @@ class SSA(Algorithm):
         self.squirrels_b = initialize_(num_agents=self.num_agents, num_features=self.num_features)
         self.squirrels_new, self.fitness = sort_agents_(self.squirrels_a, self.fitness)
         self.ind = np.where(self.fitness == max(self.fitness))[0]
+        D1 = self.algo_params['D1'] = 1 / ((2 * self.algo_params['row'] * self.algo_params['V']) ** (2 * self.algo_params['S'] * self.algo_params['cd']))
+        L = self.algo_params['L'] = 1 / ((2 * self.algo_params['row'] * self.algo_params['V']) ** (2 * self.algo_params['S'] * self.algo_params['CL']))
+        tan_phi = self.algo_params['tan_phi'] = D1 / L
+        dg = self.algo_params['dg'] = self.algo_params['hg'] / (tan_phi * self.algo_params['sf'])
 
     def check_squirrels(self, s):
         num_feat = s.shape[1]
@@ -111,7 +113,7 @@ class SSA(Algorithm):
         Gc = self.algo_params['Gc']
         D1 = self.algo_params['D1']
         L = self.algo_params['L']
-        tanpi = self.algo_params['tanpi']
+        tan_phi = self.algo_params['tan_phi']
         dg = self.algo_params['dg']
 
         for i in range(self.num_agents):
