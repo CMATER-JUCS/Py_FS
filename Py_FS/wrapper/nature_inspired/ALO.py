@@ -39,6 +39,8 @@ class ALO(Algorithm):
     def user_input(self):
         pass
 
+    
+    
     def random_walk(self,iterations):
         x_random_walk = [0]*(iterations + 1)
         x_random_walk[0] = 0
@@ -50,12 +52,18 @@ class ALO(Algorithm):
                 rand = 0
             x_random_walk[k] = x_random_walk[k-1] + (2*rand - 1)
         return x_random_walk
+    
+    
+    
+    
     def roulette_wheel(self,fitness):
         # Perform roulette wheel selection
         maximum = np.sum(fitness)
         selection_probs = [f/maximum for f in fitness]
         return np.random.choice(len(fitness), p=selection_probs)
-    # Function: Combine Ants
+    
+    
+    # Function: Combine Ants    
     def combine(self,population, antlions):
         combination = np.vstack([population, antlions])
         combination = combination[combination[:,-1].argsort()]
@@ -64,6 +72,10 @@ class ALO(Algorithm):
                 antlions[i,j]   = combination[i,j]
                 population[i,j] = combination[i + population.shape[0],j]
         return population, antlions
+    
+    
+    
+    
 
     # Function: Update Antlion
     def update_ants(self,population, antlions, count, iterations,weight):
@@ -118,6 +130,10 @@ class ALO(Algorithm):
                 population[i,j]=(x_random_walk[count] + e_random_walk[count])/2
         return population, antlions
     
+    
+    
+    
+    
     def next(self):
         print('\n================================================================================')
         print('\n                          Iteration - {}'.format(self.cur_iter + 1))
@@ -134,6 +150,9 @@ class ALO(Algorithm):
                     self.population[i,j] = 0
         self.cur_iter+=1
         compute_fitness(self.weight_acc)
+        
+        
+        
 
 if __name__ == '__main__':
     data=datasets.load_digits()
