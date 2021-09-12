@@ -13,6 +13,7 @@ from sklearn import datasets
 from sklearn import preprocessing
 
 from Py_FS.wrapper.nature_inspired.algorithm import Algorithm
+from Py_FS.wrapper.nature_inspired._transfer_functions import get_trans_function
 
 
 class MVO(Algorithm):
@@ -35,7 +36,6 @@ class MVO(Algorithm):
                  max_iter,
                  train_data,
                  train_label,
-                 trans_func_shape='s',
                  save_conv_graph=False,
                  seed=0):
 
@@ -43,18 +43,23 @@ class MVO(Algorithm):
                          max_iter=max_iter,
                          train_data=train_data,
                          train_label=train_label,
-                         trans_func_shape=trans_func_shape,
                          save_conv_graph=save_conv_graph,
                          seed=seed)
 
         self.algo_name = 'MVO'
         self.agent_name = 'Universe'
+        self.trans_function = None
         self.algo_params = {}
 
     def user_input(self):
+        # initializing parameters
         self.algo_params['Min'] = float(input('Minimum wormhole existence probability [0-1]: ') or 0.2)
         self.algo_params['Max'] = float(input('Maximum wormhole existence probability [0-1]: ') or 1.0)
         self.algo_params['p'] = float(input('Exploitation accuracy factor [1-10]: ') or 6)
+
+        # initializing transfer function
+        self.algo_params['trans_function'] = input('Shape of Transfer Function [s/v/u] (default=s): ').lower() or 's'
+        self.trans_function = get_trans_function(self.algo_params['trans_function'])
 
     def normalize(self, fitness):
         # normalize the fitness values
@@ -86,7 +91,7 @@ class MVO(Algorithm):
 
         normalized_fitness = self.normalize(self.fitness)
         WEP = Min + (self.cur_iter * (Max - Min) / self.max_iter)  # Eq. (3.3)
-        TDR = 1 - math.pow(self.cur_iter, (1 / p)) / math.pow(self.max_iter, (1 / p))  # Eq. (3.4)
+        TDR = 1 - math.pow((self.cur_iter / self.max_iter), (1 / p))  # Eq. (3.4)
 
         for i in range(self.num_agents):
             black_hole_idx = i
@@ -119,7 +124,6 @@ if __name__ == '__main__':
     algo = MVO(num_agents=20,
                max_iter=100,
                train_data=data.data,
-               train_label=data.target,
-               trans_func_shape='s')
+               train_label=data.target)
 
     solution = algo.run()

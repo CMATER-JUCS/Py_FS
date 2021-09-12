@@ -12,6 +12,7 @@ import numpy as np
 from sklearn import datasets
 
 from Py_FS.wrapper.nature_inspired.algorithm import Algorithm
+from Py_FS.wrapper.nature_inspired._transfer_functions import get_trans_function
 
 
 class AOA(Algorithm):
@@ -35,7 +36,6 @@ class AOA(Algorithm):
                  train_data,
                  train_label,
                  save_conv_graph=False,
-                 trans_func_shape='s',
                  seed=0):
 
         super().__init__(num_agents=num_agents,
@@ -43,11 +43,11 @@ class AOA(Algorithm):
                          train_data=train_data,
                          train_label=train_label,
                          save_conv_graph=save_conv_graph,
-                         trans_func_shape=trans_func_shape,
                          seed=seed)
 
         self.algo_name = 'AOA'
         self.agent_name = 'Agent'
+        self.trans_function = None
         self.algo_params = {}
 
     def user_input(self):
@@ -58,11 +58,15 @@ class AOA(Algorithm):
         self.algo_params['alpha'] = float(input('Exploitation accuracy parameter [1-10]:' ) or 5)
         self.algo_params['mu'] = float(input('Control parameter to adjust the search process [0-1]:' ) or 0.5)
 
+        # initializing transfer function
+        self.algo_params['trans_function'] = input('Shape of Transfer Function [s/v/u] (default=s): ').lower() or 's'
+        self.trans_function = get_trans_function(self.algo_params['trans_function'])
+
     def moa(self, Min, Max):
         return Min + (Max - Min) * self.cur_iter / self.max_iter
 
     def mop(self, alpha=5):
-        return 1 - (math.pow(self.cur_iter, (1 / alpha)) / math.pow(self.max_iter, (1 / alpha)))
+        return 1 - math.pow((self.cur_iter/self.max_iter), (1 / alpha))
 
     def exploration(self, i, j, MoP):
         eps = self.algo_params['EPS']
@@ -76,7 +80,6 @@ class AOA(Algorithm):
             self.population[i][j] = self.Leader_agent[j] / (MoP + eps) * mu
 
     def exploitation(self, i, j, MoP):
-        eps = self.algo_params['EPS']
         mu = self.algo_params['mu']
 
         # Eq. (5)
@@ -128,7 +131,6 @@ if __name__ == '__main__':
     algo = AOA(num_agents=20,
                max_iter=100,
                train_data=data.data,
-               train_label=data.target,
-               trans_func_shape='s')
+               train_label=data.target)
 
     solution = algo.run()

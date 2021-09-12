@@ -10,6 +10,7 @@ import numpy as np
 from sklearn import datasets
 
 from Py_FS.wrapper.nature_inspired.algorithm import Algorithm
+from Py_FS.wrapper.nature_inspired._transfer_functions import get_trans_function
 
 
 class AROA(Algorithm):
@@ -33,7 +34,6 @@ class AROA(Algorithm):
                  train_data,
                  train_label,
                  save_conv_graph=False,
-                 trans_func_shape='s',
                  seed=0):
 
         super().__init__(num_agents=num_agents,
@@ -41,21 +41,25 @@ class AROA(Algorithm):
                          train_data=train_data,
                          train_label=train_label,
                          save_conv_graph=save_conv_graph,
-                         trans_func_shape=trans_func_shape,
                          seed=seed)
 
         self.algo_name = 'AROA'
         self.agent_name = 'Particle'
+        self.trans_function = None
         self.algo_params = {}
 
     def user_input(self):
         # initializing parameters
         self.algo_params['C1'] = float(input('Control variable C1 [1,2]: ') or 2)
-        self.algo_params['C2'] = float(input('Control variable C2 [2,4,6]: ') or 6)
+        self.algo_params['C2'] = float(input('Control variable C2 [2/4/6]: ') or 6)
         self.algo_params['C3'] = float(input('Control variable C3 [1,2]: ') or 2)
         self.algo_params['C4'] = float(input('Control variable C4 [0-1]: ') or 0.5)
         self.algo_params['upper'] = float(input('upper limit for normalization [0-1]: ') or 0.9)
         self.algo_params['lower'] = float(input('lower limit for normalization [0-1]: ') or 0.1)
+
+        # initializing transfer function
+        self.algo_params['trans_function'] = input('Shape of Transfer Function [s/v/u] (default=s): ').lower() or 's'
+        self.trans_function = get_trans_function(self.algo_params['trans_function'])
 
     def initialize(self):
         super(AROA, self).initialize()
@@ -146,8 +150,6 @@ class AROA(Algorithm):
         super(AROA, self).post_processing()
         # update other leader attributes
         if self.fitness[0] > self.Leader_fitness:
-            self.Leader_agent = self.population[0].copy()
-            self.Leader_fitness = self.fitness[0].copy()
             self.Leader_position = self.position[0].copy()
             self.Leader_volume = self.volume[0].copy()
             self.Leader_density = self.density[0].copy()
@@ -193,7 +195,6 @@ if __name__ == '__main__':
     algo = AROA(num_agents=20,
                 max_iter=100,
                 train_data=data.data,
-                train_label=data.target,
-                trans_func_shape='s')
+                train_label=data.target)
 
     solution = algo.run()
