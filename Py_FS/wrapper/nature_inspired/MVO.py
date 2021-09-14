@@ -85,13 +85,9 @@ class MVO(Algorithm):
         print('                          Iteration - {}'.format(self.cur_iter + 1))
         print('================================================================================\n')
 
-        Min = self.algo_params['Min']
-        Max = self.algo_params['Max']
-        p = self.algo_params['p']
-
         normalized_fitness = self.normalize(self.fitness)
-        WEP = Min + (self.cur_iter * (Max - Min) / self.max_iter)  # Eq. (3.3)
-        TDR = 1 - math.pow((self.cur_iter / self.max_iter), (1 / p))  # Eq. (3.4)
+        WEP = self.algo_params['Min'] + (self.cur_iter * (self.algo_params['Max'] - self.algo_params['Min']) / self.max_iter)  # Eq. (3.3)
+        TDR = 1 - math.pow((self.cur_iter / self.max_iter), (1 / self.algo_params['p']))  # Eq. (3.4)
 
         for i in range(self.num_agents):
             black_hole_idx = i

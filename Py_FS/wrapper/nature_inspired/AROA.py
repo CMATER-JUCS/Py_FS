@@ -50,9 +50,9 @@ class AROA(Algorithm):
 
     def user_input(self):
         # initializing parameters
-        self.algo_params['C1'] = float(input('Control variable C1 [1,2]: ') or 2)
+        self.algo_params['C1'] = float(input('Control variable C1 [1/2]: ') or 2)
         self.algo_params['C2'] = float(input('Control variable C2 [2/4/6]: ') or 6)
-        self.algo_params['C3'] = float(input('Control variable C3 [1,2]: ') or 2)
+        self.algo_params['C3'] = float(input('Control variable C3 [1/2]: ') or 2)
         self.algo_params['C4'] = float(input('Control variable C4 [0-1]: ') or 0.5)
         self.algo_params['upper'] = float(input('upper limit for normalization [0-1]: ') or 0.9)
         self.algo_params['lower'] = float(input('lower limit for normalization [0-1]: ') or 0.1)
@@ -100,44 +100,35 @@ class AROA(Algorithm):
         self.Leader_acceleration = self.acceleration[0].copy()
 
     def exploration(self, i, j, Df):
-        C1 = self.algo_params['C1']
-
         # update acceleration
         rand_vol, rand_density, rand_accn = np.random.random(3)
         self.acceleration[i][j] = (rand_density + rand_vol * rand_accn) / (self.density[i][j] * self.volume[i][j])
         # update position
         r1, rand_pos = np.random.random(2)
         # Eq. (13)
-        self.position[i][j] = self.position[i][j] + C1 * r1 * Df * (rand_pos - self.position[i][j])
+        self.position[i][j] = self.position[i][j] + self.algo_params['C1'] * r1 * Df * (rand_pos - self.position[i][j])
 
     def exploitation(self, i, j, Tf, Df):
-        C2 = self.algo_params['C2']
-        C3 = self.algo_params['C3']
-        C4 = self.algo_params['C4']
-
         # update acceleration
         self.acceleration[i][j] = (self.Leader_density[j] + self.Leader_volume[j] * self.Leader_acceleration[j]) / (
                 self.density[i][j] * self.volume[i][j])
         # update position
         r2, r3 = np.random.random(2)
-        T_ = C3 * Tf
-        P = 2 * r3 - C4
+        T_ = self.algo_params['C3'] * Tf
+        P = 2 * r3 - self.algo_params['C4']
         # Eq. (15)
         F = 1 if P <= 0.5 else -1
         # Eq. (14)
-        self.position[i][j] = self.position[i][j] + F * C2 * r2 * self.acceleration[i][j] * Df * (
+        self.position[i][j] = self.position[i][j] + F * self.algo_params['C2'] * r2 * self.acceleration[i][j] * Df * (
                 (T_ * self.Leader_position[j]) - self.position[i][j])
 
     def normalize_accn(self, i, j):
-        upper = self.algo_params['upper']
-        lower = self.algo_params['lower']
-
         # Normalize accelerations
         max_accn = np.amax(self.acceleration[i])
         min_accn = np.amin(self.acceleration[i])
 
         # Eq. (12)
-        self.acceleration[i][j] = lower + (self.acceleration[i][j] - min_accn) / (max_accn - min_accn) * upper
+        self.acceleration[i][j] = self.algo_params['lower'] + (self.acceleration[i][j] - min_accn) / (max_accn - min_accn) * self.algo_params['upper']
 
     def transfer_to_binary(self, i, j):
         # lower acceleration => closer to equilibrium

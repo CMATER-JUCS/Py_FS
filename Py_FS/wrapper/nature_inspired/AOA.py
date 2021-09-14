@@ -69,25 +69,20 @@ class AOA(Algorithm):
         return 1 - math.pow((self.cur_iter/self.max_iter), (1 / alpha))
 
     def exploration(self, i, j, MoP):
-        eps = self.algo_params['EPS']
-        mu = self.algo_params['mu']
-
         # Eq. (3)
         r2 = np.random.random()
         if r2 >= 0.5:
-            self.population[i][j] = self.Leader_agent[j] * (MoP + eps) * mu
+            self.population[i][j] = self.Leader_agent[j] * (MoP + self.algo_params['EPS']) * self.algo_params['mu']
         else:
-            self.population[i][j] = self.Leader_agent[j] / (MoP + eps) * mu
+            self.population[i][j] = self.Leader_agent[j] / (MoP + self.algo_params['EPS']) * self.algo_params['mu']
 
     def exploitation(self, i, j, MoP):
-        mu = self.algo_params['mu']
-
         # Eq. (5)
         r3 = np.random.random()
         if r3 >= 0.5:
-            self.population[i][j] = self.Leader_agent[j] + MoP * mu
+            self.population[i][j] = self.Leader_agent[j] + MoP * self.algo_params['mu']
         else:
-            self.population[i][j] = self.Leader_agent[j] - MoP * mu
+            self.population[i][j] = self.Leader_agent[j] - MoP * self.algo_params['mu']
 
     def transfer_to_binary(self, i, j):
         if np.random.random() < self.trans_function(self.population[i][j]):
@@ -100,15 +95,11 @@ class AOA(Algorithm):
         print('                          Iteration - {}'.format(self.cur_iter + 1))
         print('================================================================================\n')
 
-        Min = self.algo_params['Min']
-        Max = self.algo_params['Max']
-        alpha = self.algo_params['alpha']
-
         # Eq. (2)
-        MoA = self.moa(Min, Max)
+        MoA = self.moa(self.algo_params['Min'], self.algo_params['Max'])
 
         # Eq. (4)
-        MoP = self.mop(alpha)
+        MoP = self.mop(self.algo_params['alpha'])
 
         for i in range(self.num_agents):
             for j in range(self.num_features):
