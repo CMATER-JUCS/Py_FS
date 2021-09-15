@@ -157,7 +157,7 @@ class ALO(Algorithm):
 
 if __name__ == '__main__':
     data=datasets.load_digits()
-    alo = ALO(num_agents=50,
+    alo = ALO(num_agents=20,
                max_iter=100,
                train_data=data.data,
                train_label=data.target,
