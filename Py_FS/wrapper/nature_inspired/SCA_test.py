@@ -67,7 +67,7 @@ class SCA(Algorithm):
                     self.population[i, j] = self.population[i, j] + \
                         (r1*np.cos(r2)*abs(r3*self.Leader_agent[j]-self.population[i, j]))
 
-                temp = self.population[i, j].copy()
+                temp = self.trans_function(self.population[i, j])
                 if temp > np.random.random():
                     self.population[i, j] = 1
                 else:
