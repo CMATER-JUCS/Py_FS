@@ -15,6 +15,7 @@ def get_dataset(dataset_name):
     # function to retrieve the data
     dir_name = os.path.dirname(os.path.abspath(__file__))
     data_paths = pkg_resources.resource_listdir('Py_FS.datasets','database')
+    data_paths = [path for path in data_paths if '.csv'in path]
     list_datasets = [os.path.splitext(os.path.basename(filename))[0] for filename in data_paths]
 
     if dataset_name not in list_datasets:
@@ -31,6 +32,7 @@ def get_dataset(dataset_name):
         df = pd.read_csv(stream, header=None)
         data.data = np.array(df.iloc[:, 0:-1])
         data.target = np.array(df.iloc[:, -1])
+        print("Requested dataset found and loaded...")
 
         return data
 
@@ -46,4 +48,5 @@ def display_datasets(list_datasets):
     print(tabulate(table_list, headers=["Index", "Dataset"]))
 
 if __name__ == '__main__':
-    get_dataset('Vow')
+    data = get_dataset('Vowel')
+    
